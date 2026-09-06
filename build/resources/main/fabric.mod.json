@@ -1,0 +1,27 @@
+{
+	"schemaVersion": 1,
+	"id": "spawn-lock-justfatlard",
+	"version": "1.0.0",
+	"name": "Spawn Lock",
+	"description": "Holds a player at the spawn: newcomers until they say the password, and anyone an operator jails, for a while or until freed. Works for stock clients.",
+	"authors": ["justfatlard"],
+	"contact": {
+		"homepage": "https://github.com/fatlard1993/spawn-lock",
+		"sources": "https://github.com/fatlard1993/spawn-lock",
+		"issues": "https://github.com/fatlard1993/spawn-lock/issues"
+	},
+	"license": "MIT",
+	"icon": "assets/spawn-lock-justfatlard/icon.png",
+	"environment": "server",
+	"entrypoints": {
+		"main": ["justfatlard.spawn_lock.Main"]
+	},
+	"mixins": ["spawn-lock.mixins.json"],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": ">=26.3-pre.2 <26.4-",
+		"java": ">=25",
+		"fabric-api": ">=0.159.4",
+		"pandorical": "*"
+	}
+}
