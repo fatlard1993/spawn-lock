@@ -21,6 +21,12 @@ public abstract class ChatCommandMixin {
 	private void spawnLock$onlyLogin(ServerboundChatCommandPacket packet, CallbackInfo ci) {
 		if (this.player == null || !Gate.isWaiting(this.player)) return;
 		String command = packet.command().trim();
+		// In jail the password is no way out, so it is not the thing to be told to say.
+		if (!Gate.isAtDoor(this.player)) {
+			this.player.sendSystemMessage(Component.literal("Not while you are in jail.").withStyle(ChatFormatting.YELLOW));
+			ci.cancel();
+			return;
+		}
 		if (command.equals("login") || command.startsWith("login ")) return;
 		this.player.sendSystemMessage(Component.literal("Say the password first.").withStyle(ChatFormatting.YELLOW));
 		ci.cancel();

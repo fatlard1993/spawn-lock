@@ -36,6 +36,9 @@ public class Main implements ModInitializer {
 
 	public static SpawnLockConfig config = new SpawnLockConfig();
 
+	/** Joined, and not yet looked at: see the JOIN handler for why the wait. */
+	private static final java.util.Set<java.util.UUID> arriving = new java.util.HashSet<>();
+
 	@Override
 	public void onInitialize() {
 		config = SpawnLockConfig.load();
@@ -43,30 +46,24 @@ public class Main implements ModInitializer {
 			LOGGER.warn("No password set: the door is open. Set one in config/spawn-lock.json or with /spawnlock set");
 		}
 
-		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-			if (!config.enabled()) {
-				ServerPlayer player = handler.getPlayer();
-				if (config.isJailed(player.getName().getString(), System.currentTimeMillis())) {
-					Gate.jail(player, config, config.jails.get(player.getName().getString()));
-				}
-				return;
-			}
-			ServerPlayer player = handler.getPlayer();
-			long now = System.currentTimeMillis();
-			// A sentence outlives a relog.
-			if (config.isJailed(player.getName().getString(), now)) {
-				Gate.jail(player, config, config.jails.get(player.getName().getString()));
-				return;
-			}
-			if (config.isRemembered(player.getName().getString(), Gate.addressOf(player), now)) {
-				// Shown out mid-wait last time and remembered since: they are saved at the door.
-				Gate.sendHome(player, config);
-				return;
-			}
-			Gate.arrive(player, config);
+		// Taken in hand a tick after joining, not on the join itself. Fabric's join fires partway
+		// through vanilla's own, before the player has been added to the level they logged out in,
+		// and a teleport to another dimension from there left them split between the two: moved
+		// to the spawn, then added to the old level by the rest of the join. Anybody who logged
+		// out anywhere but the overworld came back half in each, and the next teleport failed.
+		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> arriving.add(handler.getPlayer().getUUID()));
+		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+			arriving.remove(handler.getPlayer().getUUID());
+			Gate.leave(handler.getPlayer());
 		});
-		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> Gate.leave(handler.getPlayer()));
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
+			if (!arriving.isEmpty()) {
+				for (java.util.UUID id : java.util.List.copyOf(arriving)) {
+					arriving.remove(id);
+					ServerPlayer player = server.getPlayerList().getPlayer(id);
+					if (player != null) greet(player);
+				}
+			}
 			Gate.tick(server, config);
 			if (server.getTickCount() % 1200 == 0) config.wipeIfDue(System.currentTimeMillis());
 		});
@@ -101,6 +98,15 @@ public class Main implements ModInitializer {
 			dispatcher.register(Commands.literal("unjail")
 				.requires(source -> Commands.LEVEL_GAMEMASTERS.check(source.permissions()))
 				.then(Commands.argument("player", StringArgumentType.word())
+					// A word and not a player, because the jailed are mostly not online to be one;
+					// the suggestions are the jail roll, and whoever is standing in it right now.
+					.suggests((context, builder) -> {
+						java.util.Set<String> names = new java.util.TreeSet<>(config.jails.keySet());
+						for (ServerPlayer online : context.getSource().getServer().getPlayerList().getPlayers()) {
+							if (Gate.isWaiting(online) && !Gate.isAtDoor(online)) names.add(online.getGameProfile().name());
+						}
+						return net.minecraft.commands.SharedSuggestionProvider.suggest(names, builder);
+					})
 					.executes(context -> unjail(context.getSource(), StringArgumentType.getString(context, "player")))));
 			dispatcher.register(Commands.literal("login")
 				.then(Commands.argument("password", StringArgumentType.greedyString())
@@ -118,16 +124,14 @@ public class Main implements ModInitializer {
 					.then(Commands.argument("password", StringArgumentType.greedyString())
 						.executes(context -> {
 							config.password = StringArgumentType.getString(context, "password").trim();
-							config.remembered.clear();
-							config.save();
+							config.forgetEveryone();
 							context.getSource().sendSuccess(() -> Component.literal("Password set; everyone will be asked again.")
 								.withStyle(ChatFormatting.GREEN), true);
 							return 1;
 						})))
 				.then(Commands.literal("forget")
 					.executes(context -> {
-						config.remembered.clear();
-						config.save();
+						config.forgetEveryone();
 						context.getSource().sendSuccess(() -> Component.literal("Everyone will be asked again."), true);
 						return 1;
 					}))
@@ -211,5 +215,31 @@ public class Main implements ModInitializer {
 
 	private static boolean held(net.minecraft.world.entity.player.Player player) {
 		return player instanceof ServerPlayer serverPlayer && Gate.isWaiting(serverPlayer);
+	}
+
+	/** What the door makes of somebody who has just come in. */
+	private static void greet(ServerPlayer player) {
+		if (!config.enabled()) {
+			if (config.isJailed(player.getName().getString(), System.currentTimeMillis())) {
+				Gate.jail(player, config, config.jails.get(player.getName().getString()));
+			}
+			return;
+		}
+		long now = System.currentTimeMillis();
+		// A sentence outlives a relog.
+		if (config.isJailed(player.getName().getString(), now)) {
+			Gate.jail(player, config, config.jails.get(player.getName().getString()));
+			return;
+		}
+		if (config.isRemembered(player.getName().getString(), Gate.addressOf(player), now)
+				|| Passes.carried(player, config)) {
+			// Recognised by address or by pass, the game is handed the pass if it lacks one, so a
+			// household known only by its address today is still known when the address moves.
+			Passes.hand(player, config);
+			// Shown out mid-wait last time and remembered since: they are saved at the door.
+			Gate.sendHome(player, config);
+			return;
+		}
+		Gate.arrive(player, config);
 	}
 }

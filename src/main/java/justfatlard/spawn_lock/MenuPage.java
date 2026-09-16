@@ -21,7 +21,7 @@ final class MenuPage {
 			.list("allowed", "Allowed players",
 				MenuPage::entries,
 				(player, id) -> {
-					if (Main.config.remembered.remove(id) != null) Main.config.save();
+					Main.config.forgetEntry(id);
 				})
 			.describe("Come in without the password: the household, and anyone an operator let in with /spawnlock allow")
 			.shownWhen(MenuPage::isOperator);

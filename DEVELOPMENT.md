@@ -8,9 +8,10 @@ For what the mod is and how it plays, see [README.md](README.md).
 |---|---|
 | `Main.java` | The events that hold a player at the door, and the commands: `/login`, `/spawnlock`, `/jail`, `/unjail` |
 | `Gate.java` | Who is held, why and for how long: the pen, the wall, the countdown, the way home |
-| `SpawnLockConfig.java` | The password, the memory of who said it, the jails, and the file they live in |
+| `SpawnLockConfig.java` | The password, the memory of who said it, the passes, the jails, and the file they live in |
+| `Passes.java` | The pass a Pandorical client keeps once let in, through Pandorical's keepsakes |
 | `MenuPage.java` | The allowed list on the Pandorical mods menu, operators only |
-| `mixin/ChatCommandMixin.java` | At the door the only command is `/login` |
+| `mixin/ChatCommandMixin.java` | While held, at the door or in the jail, the only command is `/login` |
 | `generate_icon.py` | The mod menu icon, cut from vanilla's own textures |
 
 ## Building

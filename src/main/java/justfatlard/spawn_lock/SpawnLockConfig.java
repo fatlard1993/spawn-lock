@@ -39,6 +39,12 @@ public final class SpawnLockConfig {
 	/** "name@address" to the epoch millisecond they were let in. */
 	public Map<String, Long> remembered = new HashMap<>();
 	/**
+	 * Name to the pass their game carries: handed over when they are let in, and what lets them
+	 * back in when their address has changed. An address alone forgot a whole household every
+	 * time a satellite link handed it a new one, which it does every few days.
+	 */
+	public Map<String, String> passes = new HashMap<>();
+	/**
 	 * Where each player standing at the door came from: dimension, x, y, z, yaw, pitch. Kept in
 	 * the file rather than in memory because a player shown out mid-wait is saved wherever the
 	 * door was, and this is what puts them back on their next visit.
@@ -54,6 +60,7 @@ public final class SpawnLockConfig {
 				SpawnLockConfig read = GSON.fromJson(Files.readString(source), SpawnLockConfig.class);
 				if (read != null) {
 					if (read.remembered == null) read.remembered = new HashMap<>();
+					if (read.passes == null) read.passes = new HashMap<>();
 					if (read.homes == null) read.homes = new HashMap<>();
 					if (read.jails == null) read.jails = new HashMap<>();
 					if (source == OLD_FILE) read.save();
@@ -108,11 +115,27 @@ public final class SpawnLockConfig {
 		save();
 	}
 
-	/** Forget every entry for this name, wherever it came from. @return whether there was one */
+	/** Forget every entry for this name, wherever it came from, and the pass with it. @return whether there was one */
 	public boolean forget(String name) {
 		boolean any = remembered.keySet().removeIf(key -> key.startsWith(name + "@"));
+		any |= passes.remove(name) != null;
 		if (any) save();
 		return any;
+	}
+
+	/** Forget one "name@address" entry. The name's pass goes too: it is the same permission. */
+	public void forgetEntry(String key) {
+		if (remembered.remove(key) == null) return;
+		int at = key.lastIndexOf('@');
+		if (at > 0) passes.remove(key.substring(0, at));
+		save();
+	}
+
+	/** Everyone asked again: every address and every pass. */
+	public void forgetEveryone() {
+		remembered.clear();
+		passes.clear();
+		save();
 	}
 
 	public void remember(String name, String address, long now) {
@@ -131,6 +154,7 @@ public final class SpawnLockConfig {
 		}
 		if (now - lastCleared < clearEveryDays * 86_400_000L) return;
 		remembered.clear();
+		passes.clear();
 		lastCleared = now;
 		save();
 		Main.LOGGER.info("[spawn-lock] Memory wiped on schedule: everyone will be asked again");

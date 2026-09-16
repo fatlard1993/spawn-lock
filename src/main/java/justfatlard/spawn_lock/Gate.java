@@ -133,7 +133,7 @@ public final class Gate {
 			player.teleportTo(level, Double.parseDouble(parts[1]), Double.parseDouble(parts[2]), Double.parseDouble(parts[3]),
 				java.util.Set.of(), Float.parseFloat(parts[4]), Float.parseFloat(parts[5]), false);
 		} catch (RuntimeException e) {
-			Main.LOGGER.warn("Could not send {} home ({}): {}", player.getName().getString(), home, e.getMessage());
+			Main.LOGGER.warn("Could not send {} home ({})", player.getName().getString(), home, e);
 		}
 	}
 
@@ -158,6 +158,7 @@ public final class Gate {
 
 	private static void admit(ServerPlayer player, SpawnLockConfig config) {
 		config.remember(player.getName().getString(), addressOf(player), System.currentTimeMillis());
+		Passes.hand(player, config);
 		release(player, config);
 		player.sendSystemMessage(Component.literal("Welcome in.").withStyle(ChatFormatting.GREEN));
 		Main.LOGGER.info("{} gave the password", player.getName().getString());
@@ -171,7 +172,8 @@ public final class Gate {
 	public static void tick(net.minecraft.server.MinecraftServer server, SpawnLockConfig config) {
 		if (waiting.isEmpty()) return;
 		long now = System.currentTimeMillis();
-		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+		// Over a copy: a disconnect below removes the player from the live list mid-walk.
+		for (ServerPlayer player : java.util.List.copyOf(server.getPlayerList().getPlayers())) {
 			Waiting at = waiting.get(player.getUUID());
 			if (at == null) continue;
 			if (at.reason() == Reason.DOOR) {
