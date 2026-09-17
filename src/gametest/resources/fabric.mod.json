@@ -1,0 +1,18 @@
+{
+	"schemaVersion": 1,
+	"id": "spawn-lock-gametest",
+	"version": "1.0.0",
+	"name": "Spawn Lock game tests",
+	"description": "The pictures for the readme and the mod page.",
+	"license": "MIT",
+	"environment": "*",
+	"entrypoints": {
+		"fabric-client-gametest": [
+			"justfatlard.spawn_lock.gametest.Showcase"
+		]
+	},
+	"depends": {
+		"spawn-lock-justfatlard": "*",
+		"fabric-client-gametest-api-v1": "*"
+	}
+}
