@@ -1,6 +1,7 @@
 package justfatlard.spawn_lock;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
+import justfatlard.pandorical.api.PandoricalApi;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
@@ -41,6 +42,11 @@ public class Main implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		// Held here means held from everything, including whatever Pandorical would say to
+		// somebody on the way in. A penned player is being asked for a password; the list of every
+		// mod on the server is neither useful to them yet nor ours to hand out before they answer.
+		PandoricalApi.heldWhile(Gate::isWaiting);
+
 		config = SpawnLockConfig.load();
 		if (!config.enabled()) {
 			LOGGER.warn("No password set: the door is open. Set one in config/spawn-lock.json or with /spawnlock set");

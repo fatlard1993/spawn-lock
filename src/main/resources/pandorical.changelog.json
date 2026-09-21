@@ -1,0 +1,19 @@
+{
+	"overview": [
+		"A pen at the spawn, for two kinds of people: the ones who have not said the password yet, and the ones an operator has put there."
+	],
+	"versions": {
+		"1.0.4": [
+			"Somebody still at the door is held from everything, not just from the world: the greeting and the list of what the server runs wait until the password is answered."
+		],
+		"1.0.3": [
+			"No change to play: a fresh number so the build had a file of its own to go up."
+		],
+		"1.0.2": [
+			"Your game is handed a pass when you are let in, so a household whose address changes every few days is not asked for the password all over again. Forgetting a name, or setting a new password, takes the passes with it. Anyone who logged out in another dimension is greeted properly now."
+		],
+		"1.0.0": [
+			"The pen: held within sixteen blocks of world spawn behind a border wall only you can see, unable to touch anything and unable to be hurt, and put back exactly where you were taken from. A newcomer is asked for the password in chat, which a stock client can answer, and an operator can jail somebody for a while or until freed."
+		]
+	}
+}
