@@ -17,7 +17,7 @@
 		"1.0.2": [
 			"Your game is handed a pass when you are let in, so a changing address is not asked twice.",
 			"Forgetting a name, or setting a new password, takes the passes with it.",
-			"Anyone who logged out in another dimension is greeted properly."
+			"Anyone who logged out in another dimension gets the greeting on return."
 		],
 		"1.0.0": [
 			"The pen: held within sixteen blocks of world spawn, behind a border wall only you can see.",
