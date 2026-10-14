@@ -3,6 +3,9 @@
 		"A pen at the spawn, for two kinds of people: the ones who have not said the password yet, and the ones an operator has put there."
 	],
 	"versions": {
+		"1.0.6": [
+			"Release notes rewritten to read plainly; nothing in play changes."
+		],
 		"1.0.5": [
 			"A command is held at the door whichever of the two ways the game sends it.",
 			"Before, one of those ways went straight through, so somebody who had not said the password could still run commands."
