@@ -3,15 +3,6 @@
 		"A pen at the spawn, for two kinds of people: the ones who have not said the password yet, and the ones an operator has put there."
 	],
 	"versions": {
-		"1.0.8": [
-			"Its tests draw a small window unless taking pictures, which runs them faster; nothing in play changes."
-		],
-		"1.0.7": [
-			"Mod Menu's Donate button leads to sponsoring the author on GitHub. Nothing in play changes."
-		],
-		"1.0.6": [
-			"Release notes rewritten to read plainly; nothing in play changes."
-		],
 		"1.0.5": [
 			"A command is held at the door whichever of the two ways the game sends it.",
 			"Before, one of those ways went straight through, so somebody who had not said the password could still run commands."
@@ -19,9 +10,6 @@
 		"1.0.4": [
 			"Somebody at the door is held from everything, not just from the world.",
 			"The greeting and the mod list wait until the password is answered."
-		],
-		"1.0.3": [
-			"No change to play: a fresh number so the build had a file of its own to go up."
 		],
 		"1.0.2": [
 			"Your game is handed a pass when you are let in, so a changing address is not asked twice.",
