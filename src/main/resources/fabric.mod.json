@@ -3,7 +3,7 @@
 	"id": "spawn-lock-justfatlard",
 	"version": "${version}",
 	"name": "Spawn Lock",
-	"description": "Holds a player at the spawn: newcomers until they say the password, and anyone an operator jails, for a while or until freed. Works for stock clients.",
+	"description": "Holds newcomers at spawn until they give the password, and jails who an operator sends",
 	"authors": ["justfatlard"],
 	"contact": {
 		"homepage": "https://github.com/fatlard1993/spawn-lock",
