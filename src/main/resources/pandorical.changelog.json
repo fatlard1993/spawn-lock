@@ -3,6 +3,9 @@
 		"A pen at the spawn, for two kinds of people: the ones who have not said the password yet, and the ones an operator has put there."
 	],
 	"versions": {
+		"1.0.10": [
+			"Describes itself in one short line of what it adds."
+		],
 		"1.0.9": [
 			"Drop changelog notes for changes nothing in the game shows."
 		],
